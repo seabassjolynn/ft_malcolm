@@ -1,0 +1,14 @@
+networks:
+  arp_test_network:
+    driver: bridge
+
+services:
+  arp_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - arp_test_network
+    deploy:
+      replicas: 3
+    command: ["sleep", "infinity"]

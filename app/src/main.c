@@ -22,8 +22,15 @@ int main(int ac, char **av)
         free_resources();
         exit(EXIT_FAILURE);
     }
-
-
+    
+    char buff[1042];
+    ft_bzero(buff, sizeof(buff));
+    while (1)
+    {
+        printf("Start recvfrom\n");
+        int result = recvfrom(g_resources.socket, buff, sizeof(buff), 0, NULL, NULL);
+        printf("Received %d bytes\n", result);
+    }
     free_resources();
     return EXIT_SUCCESS;
 }

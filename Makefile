@@ -3,14 +3,14 @@ APP = $(APP_NAME)
 APP_NAME=ft_malcolm
 SRCS_DIR = src
 HEADERS_DIR = headers
-SRCS = $(addprefix $(SRCS_DIR)/, main.c)
+SRCS = $(addprefix $(SRCS_DIR)/, main.c resources.c)
 
-#HEADERS = $(addprefix $(HEADERS_DIR)/, tr_data.h utils.h resources.h net.h traceroute.h)
+HEADERS = $(addprefix $(HEADERS_DIR)/, resources.h)
 
 OBJS = $(SRCS:.c=.o)
 
 CC = gcc
- 
+
 CFLAGS =  -c -g -Wall -Wextra -Werror # Flag for implicit rules.
 # -Wall - show all error messager
 # -c compile (produce *.o files but not link)
@@ -31,9 +31,9 @@ endif
 all: $(APP)
 	
 
-$(APP): $(OBJS) #here this OBJS variable is expaned to list of .o files. And make will go and look for rule that corresponds to name.o file. And it will find this rule in %.o : %.c
+$(APP): $(OBJS) libft/libft.a #here this OBJS variable is expaned to list of .o files. And make will go and look for rule that corresponds to name.o file. And it will find this rule in %.o : %.c
 	@ echo link executable: $(APP_NAME)
-	@ $(CC) -o $(APP) $(OBJS)
+	@ $(CC) -o $(APP) $(OBJS) -Llibft -lft
 # -o is compiler flag to produce object *.o file with particular name 
 
 #below is % is a vild card. We say that if we want to produce %.o (whatever name dot o) then we need as dependency same name dot c
@@ -43,7 +43,10 @@ $(APP): $(OBJS) #here this OBJS variable is expaned to list of .o files. And mak
 
 %.o: %.c $(HEADERS)
 	@ echo compile $@
-	$(CC) $(CFLAGS) -I$(HEADERS_DIR) $< -o $@
+	$(CC) $(CFLAGS) -I$(HEADERS_DIR) -Ilibft $< -o $@
+
+libft/libft.a:
+	make -C libft
 
 clean:
 	@ echo remove object files

@@ -8,14 +8,19 @@
 
 #include "resources.h"
 #include "libft.h"
+#include "net.h"
+#include <stdio.h>
 
+//Узнавать какие интерфейсы доступны и печатать их
+//Печатать какие интерфейсы доступны
 int main(int ac, char **av)
 {
     (void)ac;
     (void)av;
+    char arr[3];
+    char *arr1 = arr;
     
-    
-    g_resources.socket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
+    g_resources.socket = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ARP));
     if (g_resources.socket == -1)
     {
         printf("%s : error when opening the socket %s\n", av[0], strerror(errno));
@@ -23,13 +28,15 @@ int main(int ac, char **av)
         exit(EXIT_FAILURE);
     }
     
-    char buff[1042];
-    ft_bzero(buff, sizeof(buff));
+    struct s_arp_packet arp_packet;
+    
     while (1)
     {
+        ft_bzero(&arp_packet, sizeof(struct s_arp_packet));
         printf("Start recvfrom\n");
-        int result = recvfrom(g_resources.socket, buff, sizeof(buff), 0, NULL, NULL);
+        int result = recvfrom(g_resources.socket, &arp_packet, sizeof(struct s_arp_packet), 0, NULL, NULL);
         printf("Received %d bytes\n", result);
+        printf("Packet data. Hardware addres len: %d protocol addr len %d\n", arp_packet.hardware_addr_len, arp_packet.protocol_addr_len);
     }
     free_resources();
     return EXIT_SUCCESS;

@@ -14,4 +14,8 @@ void init_resources();
 
 void free_resources();
 
+void clean_exit_failure(char *error);
+
+void clean_exit_success();
+
 #endif

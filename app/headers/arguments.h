@@ -24,6 +24,10 @@ struct s_arguments
     uint8_t target_mac[6];
 };
 
-extern struct s_arguments g_arguments
+extern struct s_arguments g_arguments;
+
+void parse_args(int ac, char **av);
+
+void debug_print_arguments();
 
 #endif

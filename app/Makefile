@@ -3,9 +3,9 @@ APP = $(APP_NAME)
 APP_NAME=ft_malcolm
 SRCS_DIR = src
 HEADERS_DIR = headers
-SRCS = $(addprefix $(SRCS_DIR)/, main.c resources.c)
+SRCS = $(addprefix $(SRCS_DIR)/, main.c resources.c arguments.c net.c)
 
-HEADERS = $(addprefix $(HEADERS_DIR)/, resources.h)
+HEADERS = $(addprefix $(HEADERS_DIR)/, resources.h arguments.h net.h)
 
 OBJS = $(SRCS:.c=.o)
 

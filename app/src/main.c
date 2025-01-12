@@ -10,16 +10,25 @@
 #include "libft.h"
 #include "net.h"
 #include <stdio.h>
+#include "arguments.h"
+#include "debug.h"
+
+#define ROOT_USER 0
 
 //Узнавать какие интерфейсы доступны и печатать их
 //Печатать какие интерфейсы доступны
 int main(int ac, char **av)
 {
-    (void)ac;
-    (void)av;
-    char arr[3];
-    char *arr1 = arr;
+    if (getuid() != ROOT_USER)
+        clean_exit_failure("Error: Application may by run by root user only");
+    else
+        DEBUG_LOG("Application is started by root user, continue execution");
+ 
+    parse_args(ac, av);
+    debug_print_arguments();
     
+    print_network_intefaces();
+
     g_resources.socket = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ARP));
     if (g_resources.socket == -1)
     {

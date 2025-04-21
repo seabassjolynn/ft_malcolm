@@ -3,7 +3,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
-
 struct s_resources g_resources;
 
 void init_resources()
@@ -21,6 +20,7 @@ void free_resources()
 
 void clean_exit_failure(char *error)
 {
+    printf(COLOR_RESET);
     printf("%s. Errno value: %s\n", error, strerror(errno));
     free_resources();
     exit(EXIT_FAILURE);

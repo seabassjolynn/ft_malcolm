@@ -1,15 +1,18 @@
-FROM alpine:latest
+FROM debian:latest
 
-RUN apk update
+RUN apt update
 
 #utility can intercept arp packets
 #it is used in the project for debugging, e.g. to verify that it is possible to intercept ARP
 #packets on host B, sent from host A 
-RUN apk add tcpdump
-
-#next 2 lines install make, gcc some libraries and header files needed for project
-RUN apk add build-base
-RUN apk add linux-headers
+RUN apt install tcpdump -y
+RUN apt install make
+RUN apt install gcc -y
+RUN apt install iputils-ping -y
+RUN apt install arping -y
+RUN apt install tcpdump -y
+RUN apt install net-tools -y # Install net-tools to provide the arp utility for network debugging
+RUN apt install iproute2 -y # Install iproute2 to provide the ip utility for network configuration and debugging
 
 RUN mkdir /app
 COPY /app /app

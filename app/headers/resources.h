@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 
+#include "color_output.h"
+
 struct s_resources
 {
     int socket;

@@ -12,3 +12,8 @@ services:
     deploy:
       replicas: 3
     command: ["sleep", "infinity"]
+    # Add capabilities to allow network administration and raw packet sending
+    # These capabilities are needed to be able to flush the ARP table
+    cap_add:
+      - NET_ADMIN  # Allows the container to perform network administration tasks
+      - NET_RAW    # Allows the container to send raw packets

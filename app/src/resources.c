@@ -20,8 +20,7 @@ void free_resources()
 
 void clean_exit_failure(char *error)
 {
-    printf(COLOR_RESET);
-    printf("%s. Errno value: %s\n", error, strerror(errno));
+    printf(RED"%s. Errno value: %s\n"COLOR_RESET, error, strerror(errno));
     free_resources();
     exit(EXIT_FAILURE);
 }

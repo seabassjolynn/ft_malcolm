@@ -9,103 +9,35 @@ void get_local_mac_and_ip(void)
         clean_exit_failure("Failed to read available network interfaces");
     
     ifaddrs_tmp = ifaddrs;
+    bool is_mac_found = false;
+    bool is_ip_found = false;
     while (ifaddrs_tmp)
     {
         if (ifaddrs_tmp->ifa_addr != NULL)
         {
-            if (ifaddrs_tmp->ifa_addr->sa_family == AF_PACKET && ft_strncmp(ifaddrs_tmp->ifa_name, "eth0", 4) == 0)
+            if (ifaddrs_tmp->ifa_addr->sa_family == AF_PACKET && ft_strncmp(ifaddrs_tmp->ifa_name, g_arguments.local_network_interface, 4) == 0)
             {
                 struct sockaddr_ll *addr = (struct sockaddr_ll *)ifaddrs_tmp->ifa_addr;
                 ft_memcpy(&g_arguments.local_mac_binary, addr->sll_addr, MAC_ADDR_BYTE_LEN);
                 binary_mac_to_str(g_arguments.local_mac_binary, g_arguments.local_mac_str);
+                is_mac_found = true;
             }
-            else if (ifaddrs_tmp->ifa_addr->sa_family == AF_INET && ft_strncmp(ifaddrs_tmp->ifa_name, "eth0", 4) == 0)
+            else if (ifaddrs_tmp->ifa_addr->sa_family == AF_INET && ft_strncmp(ifaddrs_tmp->ifa_name, g_arguments.local_network_interface, 4) == 0)
             {
                 struct sockaddr_in *addr = (struct sockaddr_in *)ifaddrs_tmp->ifa_addr;
                 ft_memcpy(&g_arguments.local_ip_net, &addr->sin_addr, sizeof(struct in_addr));
                 ipv4_net_to_str(&g_arguments.local_ip_net, g_arguments.local_ip_str);
+                is_ip_found = true;
             }
         }
-
         ifaddrs_tmp = ifaddrs_tmp->ifa_next;
     }
     freeifaddrs(ifaddrs);
+    if (!is_mac_found)
+        clean_exit_failure("Failed to find mac address for interface");
+    if (!is_ip_found)
+        clean_exit_failure("Failed to find ip address for interface");
 }
-
-static void print_address(struct sockaddr *sockaddr)
-{
-    printf("Address family: ");
-    switch (sockaddr->sa_family)
-    {
-        case AF_INET:
-        {
-            printf("AF_INET. ");
-            struct sockaddr_in *addr = (struct sockaddr_in*) sockaddr;
-            char str_addr[INET_ADDRSTRLEN];
-            ft_bzero(str_addr, sizeof(str_addr));
-            if (inet_ntop(AF_INET, &addr->sin_addr, str_addr, sizeof(str_addr)) != NULL)
-                printf("Address: %s\n", str_addr);
-            else
-                printf("Address: %s\n", "NULL");
-            break;
-        }
-        case AF_INET6:  // IPv6 address
-        {
-            printf("AF_INET6. ");
-            struct sockaddr_in6 *addr = (struct sockaddr_in6 *) sockaddr;
-            char str_addr[INET6_ADDRSTRLEN];
-            memset(str_addr, 0, sizeof(str_addr));  // Use memset or bzero
-            if (inet_ntop(AF_INET6, &addr->sin6_addr, str_addr, sizeof(str_addr)) != NULL)
-                printf("Address: %s\n", str_addr);
-            else
-                printf("Address: %s\n", "NULL");
-            break;
-        }
-        case AF_PACKET:  // Link-layer (MAC) address
-        {
-            printf("AF_PACKET. ");
-            struct sockaddr_ll *addr = (struct sockaddr_ll *) sockaddr;
-            printf("MAC Address: ");
-            for (int i = 0; i < addr->sll_halen; i++) {
-                printf("%02x", addr->sll_addr[i]);
-                if (i < addr->sll_halen - 1)
-                    printf(":");
-            }
-            printf("\n");
-            break;
-        }
-        default:
-            printf("Unknown address family\n");
-    
-    }
-}
-
-void print_network_intefaces()
-{
-    struct ifaddrs *ifaddrs;
-    struct ifaddrs *ifaddrs_tmp;
-
-    if (getifaddrs(&ifaddrs) == -1)
-        clean_exit_failure("Failed to read available network interfaces");
-    printf("--- Available network interfaces---\n");
-    
-    ifaddrs_tmp = ifaddrs;
-    
-    while (ifaddrs_tmp)
-    {
-        printf("name: %s\n", ifaddrs_tmp->ifa_name);
-        if (ifaddrs_tmp->ifa_addr != NULL)
-            print_address(ifaddrs_tmp->ifa_addr);
-        else
-            printf("No address info");
-        
-        ifaddrs_tmp = ifaddrs_tmp->ifa_next;
-    }
-    
-    freeifaddrs(ifaddrs);
-}
-
-
 
 void print_mac(uint8_t *arr)
 {
@@ -114,29 +46,29 @@ void print_mac(uint8_t *arr)
 
 void print_arp_packet(struct s_arp_packet *packet)
 {
-    printf("Received ARP packet\n");
+    printf(YELLOW"Received ARP packet\n"COLOR_RESET);
     
     uint16_t link_level_proto = ntohs(packet->hardware_type);
     if (link_level_proto == ARPHRD_ETHER)
     {
-        printf("Data link layer protocol: Ethernet\n");
+        printf(YELLOW"Data link layer protocol: Ethernet\n"COLOR_RESET);
     }
     else
     {
-        printf("Data link layer protocol: unknown\n");
+        printf(RED"Data link layer protocol: unknown\n"COLOR_RESET);
     }
     
     uint16_t internetwork_proto = ntohs(packet->protocol_type);
     if (internetwork_proto == 0x0800)
     {
-        printf("Internetwork protocol for which the ARP request is intended: IPV4\n");
+        printf(YELLOW"Internetwork protocol for which the ARP request is intended: IPV4\n"COLOR_RESET);
     }
     else
     {
-        printf("Internetwork protocol for which the ARP request is intended: Unknown\n");
+        printf(RED"Internetwork protocol for which the ARP request is intended: Unknown\n"COLOR_RESET);
     }
     
-    printf("Sender mac: ");
+    printf(YELLOW"Sender mac: "COLOR_RESET);
     print_mac(packet->sender_hardware_addr);
     printf("\n");
 
@@ -144,26 +76,26 @@ void print_arp_packet(struct s_arp_packet *packet)
     ft_bzero(ipv4_addr_str, INET_ADDRSTRLEN);
     
     ipv4_net_to_str((struct in_addr *)&packet->sender_protocol_addr, ipv4_addr_str);
-    printf("Sender IPV4 addr is: %s\n", ipv4_addr_str);
+    printf(YELLOW"Sender IPV4 addr is: %s\n"COLOR_RESET, ipv4_addr_str);
 
-    printf("Dst mac: ");
+    printf(YELLOW"Dst mac: "COLOR_RESET);
     print_mac(packet->target_hardware_addr);
     printf("\n");
 
     ipv4_net_to_str((struct in_addr *)&packet->target_protocol_addr, ipv4_addr_str);
-    printf("Dst IPV4 addr is: %s\n", ipv4_addr_str);
+    printf(YELLOW"Dst IPV4 addr is: %s\n"COLOR_RESET, ipv4_addr_str);
     
     if (ntohs(packet->operation) == 1)
     {
-        printf("Arp operation: request\n");
+        printf(YELLOW"Arp operation: request\n"COLOR_RESET);
     }
     else if (ntohs(packet->operation) == ARP_OPERATION_REPLY)
     {
-        printf("Arp operation: reply\n");
+        printf(YELLOW"Arp operation: reply\n"COLOR_RESET);
     }
     else
     {
-        printf("Arp operation: unknown\n");
+        printf(RED"Arp operation: unknown\n"COLOR_RESET);
     }
 }
 
@@ -180,7 +112,7 @@ bool macs_equal(uint8_t mac1[], uint8_t mac2[])
     return true;
 }
 
-void ipv4_net_to_str(const struct in_addr *addr, char ip_str[]) {
+void ipv4_net_to_str(struct in_addr *addr, char ip_str[]) {
     if (inet_ntop(AF_INET, addr, ip_str, INET_ADDRSTRLEN) == NULL) {
         clean_exit_failure("Failed to convert net ipv4 to str\n");
     }
@@ -213,7 +145,7 @@ void binary_mac_to_str(const uint8_t *mac, char *str) {
         }
         octet_index++;
     }
-    str[MAC_CHAR_LEN] = '\0';
+    str[MAC_ADDRSTRLEN - 1] = '\0';
 }
 
 static uint8_t hex_to_byte(unsigned char hex)
@@ -236,7 +168,7 @@ static int is_hex(char c)
 
 void str_mac_to_binary(char *mac_str, uint8_t mac_net[])
 {
-    if (ft_strlen(mac_str) != MAC_CHAR_LEN)
+    if (ft_strlen(mac_str) != (MAC_ADDRSTRLEN - 1))
         clean_exit_failure("Mac address len is not 17");
     
     int i = 0;
@@ -266,6 +198,6 @@ void str_mac_to_binary(char *mac_str, uint8_t mac_net[])
 
 void print_local_mac_and_ip()
 {
-    printf("Local mac: %s\n", g_arguments.local_mac_str);
-    printf("Local ip: %s\n", g_arguments.local_ip_str);
+    printf(YELLOW"Local mac on local network inteface %s: %s\n"COLOR_RESET, g_arguments.local_network_interface, g_arguments.local_mac_str);
+    printf(YELLOW"Local ip on local network interface %s: %s\n"COLOR_RESET, g_arguments.local_network_interface, g_arguments.local_ip_str);
 }

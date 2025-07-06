@@ -11,7 +11,9 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-
+/*dstsize - total number of characters to write to dst including terminator. 
+E.g. if str is "hello" then in order to write full string 
+dstsize should be equal to 5 + 1*/
 size_t		ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
 	size_t	src_len;

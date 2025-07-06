@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "inet.h": "c",
-        "resources.h": "c"
+        "resources.h": "c",
+        "arguments.h": "c"
     }
 }

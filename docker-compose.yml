@@ -1,19 +1,47 @@
-networks:
-  arp_test_network:
-    driver: bridge
-
 services:
-  arp_test:
+  arp_test_1:
     build:
       context: .
       dockerfile: Dockerfile
     networks:
       - arp_test_network
     deploy:
-      replicas: 3
+      replicas: 1
     command: ["sleep", "infinity"]
-    # Add capabilities to allow network administration and raw packet sending
-    # These capabilities are needed to be able to flush the ARP table
     cap_add:
-      - NET_ADMIN  # Allows the container to perform network administration tasks
-      - NET_RAW    # Allows the container to send raw packets
+      - NET_ADMIN # Allows the container to perform network administration tasks
+      - NET_RAW # Allows the container to send raw packets
+
+  arp_test_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - arp_test_network
+    deploy:
+      replicas: 1
+    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./volumes/volume_2:/data
+
+  arp_test_3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - arp_test_network
+    deploy:
+      replicas: 1
+    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./volumes/volume_3:/data
+
+networks:
+  arp_test_network:
+    driver: bridge 

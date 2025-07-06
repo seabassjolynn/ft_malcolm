@@ -22,7 +22,6 @@
 #define IPV4_ADDR_BYTE_LEN 4
 #define ARP_OPERATION_REQUERST 1
 #define ARP_OPERATION_REPLY 2
-#define MAC_CHAR_LEN 17
 
 //this is a compiler directive that is used to avoid padding of fields in struct.
 //e.g. if I don't add the directive here, the compiler moves sender_protocol_addr to bytes forward
@@ -41,15 +40,13 @@ struct s_arp_packet
 };
 #pragma pack(pop) 
 
-void print_network_intefaces();
-
 void print_arp_packet(struct s_arp_packet *packet);
 
 void print_mac(uint8_t *arr);
 
 bool macs_equal(uint8_t mac1[], uint8_t mac2[]);
 
-void ipv4_net_to_str(const struct in_addr *addr, char ip_str[]);
+void ipv4_net_to_str(struct in_addr *addr, char ip_str[]);
 
 bool is_broadcast_mac(uint8_t mac[]);
 

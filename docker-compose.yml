@@ -24,8 +24,6 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    volumes:
-      - ./volumes/volume_2:/data
 
   arp_test_3:
     build:
@@ -39,8 +37,6 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    volumes:
-      - ./volumes/volume_3:/data
 
 networks:
   arp_test_network:

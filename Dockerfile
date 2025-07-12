@@ -15,6 +15,8 @@ RUN apt install net-tools -y # Install net-tools to provide the arp utility for 
 RUN apt install iproute2 -y # Install iproute2 to provide the ip utility for network configuration and debugging
 RUN apt install vim -y
 RUN apt install valgrind -y
+RUN apt install ltrace -y
+RUN apt install strace -y
 
 RUN mkdir /app
 COPY app /app

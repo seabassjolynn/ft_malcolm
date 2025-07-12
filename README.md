@@ -37,7 +37,7 @@ It then sends back a **spoofed MAC address** to Host A — one that Host A will 
    Find the name of the project network. It will be named like `*_malcolm_arp_test_network`.
 
 5. **Inspect the Docker network**  
-   Use this to get the IP addresses of the containers:
+   Use this to see the IP and MAC addresses of the containers:
    ```bash
    docker network inspect *_malcolm_arp_test_network
    ```
@@ -62,16 +62,18 @@ It then sends back a **spoofed MAC address** to Host A — one that Host A will 
    arp -a
    ```
    No output should appear yet — the container doesn't know other MACs yet.
+   Second container will be a host A - host that sends ARP to know mac of host B
 
 8. **Monitor ARP requests**  
    In the **third container**, run:
    ```bash
    tcpdump -i eth0 arp
    ```
-   This starts capturing ARP packets, to verify that Host #2 sends the multicast ARP request.
+   This container is a Host B.
+   This starts capturing ARP packets, to verify that Host #2 (or hos A) sends the multicast ARP request.
 
 9. **Trigger ARP request**  
-   In the **second container**, run:
+   In the **second container - host A**, run:
    ```bash
    ping -c 1 <ip1>
    ```
@@ -83,6 +85,7 @@ It then sends back a **spoofed MAC address** to Host A — one that Host A will 
     ```
     received ARP request, send spoofed mac, please wait.
     ```
+   In the **third container**, tcpdupm should print that a host wants to know mac of another host. It verfies that ARP request was sent out.
 
 11. **Verify ARP table (after)**  
     In the **second container**, run:
@@ -90,3 +93,8 @@ It then sends back a **spoofed MAC address** to Host A — one that Host A will 
     arp -a
     ```
     You should now see that `ip1` is associated with `mac1` — the spoofed MAC.
+12. **Mischief managed.**  
+    Run in a separate terminal 
+    ```bash
+    docker compose down 
+    ```
